@@ -17,22 +17,35 @@
             <div class="row">
                 <div class="col-4">
                     <div class="card p-3 mt-2">
-                        <h3 class="text-center">Create User</h3>
-                            <form>
+                        <h3 class="text-center" x-show="isCreate">Create User</h3>
+                        <h3 class="text-center" x-show="!isCreate">Update User</h3>
+                            <form @submit.prevent="addUser()" x-show="isCreate">
                                 <div class="form-group">
                                     <label>Name</label>
-                                    <input type="text" class="form-control" x-model="user.name">
+                                    <input type="text" class="form-control" x-model="form.name">
                                 </div>
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="text" class="form-control" x-model="user.email">
+                                    <input type="email" class="form-control" x-model="form.email">
                                 </div>
                                 <button type="submit" class="btn btn-primary">Create</button>
+                            </form>
+                            <form @submit.prevent="updateUser()" x-show="!isCreate">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" class="form-control" x-model="form.name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" x-model="form.email">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update</button>
                             </form>
                     </div>
                 </div>
                 <div class="col-8">
                     <h2>Users List</h2>
+                    <button @click="createUser()" class="btn btn-success m-3">Add User</button>
                     <table class="table">
                         <thead>
                             <tr>
@@ -50,9 +63,9 @@
                                 <td x-text="user.email"></td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <button 
+                                        <button @click="editUser(user)"
                                             class="btn btn-success">Edit</button>
-                                        <button 
+                                        <button @click="deleteUser(user.id)"
                                             class="btn btn-danger">Delete</button>
                                     </div>
                                 </td>
@@ -68,20 +81,83 @@
     <script>
         const retrieveUsers = function() {
             return {
+                isCreate: true,
                 init(){
                     this.getData()
+                },
+                form: {
+                    name: '',
+                    email: '',
                 },
                 users:[],
                 async getData() {
                     try {
-                       let res = await fetch('http://127.0.0.1:8000/api/users')
-                        this.users = await res.json();
+                       let response = await fetch('http://127.0.0.1:8000/api/users')
+                        this.users = await response.json();
                     } catch (error) {
                         
+                    }
+                },
+                async createUser(){
+                    this.isCreate = true
+                    this.form.id = '';
+                    this.form.name ='';
+                    this.form.email ='';
+                },
+                async addUser(){
+                    try{
+                        let response = await fetch('http://127.0.0.1:8000/api/users', {
+                          method: 'POST',
+                          headers: { 
+                            'Content-Type': 'application/json' ,
+                            'Accept': 'application/json',
+                        },
+                          body: JSON.stringify(this.form)                                                     
+                        })
+                        let data =  await response.json();
+                        this.getData();    
+                    }catch(error){
+                        
+                    }
+                },
+                async editUser(user){
+                    this.isCreate = false
+                    this.form.id = user.id;
+                    this.form.name = user.name;
+                    this.form.email = user.email;
+                },
+                async updateUser(){
+                    try{
+                        this.form._method = 'PUT'
+                        let response = await fetch(`http://127.0.0.1:8000/api/users/${this.form.id}`, {
+                          method: 'POST',
+                          headers: { 
+                              'Content-Type': 'application/json',
+                              'Accept': 'application/json',
+                             },
+                          body: JSON.stringify(this.form)                                                     
+                        })
+                        let data  =  await response.json();
+                        this.getData();
+                    }catch(error){
+                        
+                    }
+                },
+                async deleteUser(id){
+                    try{
+                        let response = await fetch(`http://127.0.0.1:8000/api/users/${id}`, {
+                          method: 'DELETE',                                                     
+                        })
+                        await response.json();
+                        this.getData();
+                    }
+                    catch(error){
+
                     }
                 }
             }
         }
+    
     </script>
 </body>
 </html>
