@@ -111,13 +111,19 @@
                         
                     }
                 },
-                async createUser(){
-                    this.isCreate = true
+                async resetError(){
+                    this.errors.email ='';
+                    this.errors.name = ''
+                },
+                async resetForm(){
                     this.form.id = '';
                     this.form.name ='';
                     this.form.email ='';
-                    this.errors.email ='';
-                    this.errors.name = ''
+                },
+                async createUser(){
+                    this.isCreate = true
+                    this.resetForm();
+                    this.resetError();                   
                 },
                 async addUser(){
                     try{
@@ -142,8 +148,7 @@
                     this.form.id = user.id;
                     this.form.name = user.name;
                     this.form.email = user.email;
-                    this.errors.email ='';
-                    this.errors.name = ''
+                    this.resetError();                   
                 },
                 async updateUser(){
                     try{
