@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -51,8 +52,8 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'nullable|string',
-            'email' => 'nullable|string|email|max:255|unique:users'
+            'name' => 'required|string',
+            'email' =>  ['required', 'max:191', 'email'],
         ]);
         $user = User::find($id);
         $user->update($request->all());

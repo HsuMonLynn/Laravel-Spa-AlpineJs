@@ -23,10 +23,16 @@
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input type="text" class="form-control" x-model="form.name">
+                                    <template x-if="errors.name">
+                                        <p class="text-danger" x-text="errors.name[0]"></p>
+                                    </template>
                                 </div>
                                 <div class="form-group">
                                     <label>Email</label>
                                     <input type="email" class="form-control" x-model="form.email">
+                                    <template x-if="errors.email">
+                                        <p class="text-danger" x-text="errors.email[0]"></p>
+                                    </template>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Create</button>
                             </form>
@@ -34,10 +40,16 @@
                                 <div class="form-group">
                                     <label>Name</label>
                                     <input type="text" class="form-control" x-model="form.name">
+                                    <template x-if="errors.name">
+                                        <p class="text-danger" x-text="errors.name[0]"></p>
+                                    </template>
                                 </div>
                                 <div class="form-group">
                                     <label>Email</label>
                                     <input type="email" class="form-control" x-model="form.email">
+                                    <template x-if="errors.email">
+                                        <p class="text-danger" x-text="errors.email[0]"></p>
+                                    </template>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Update</button>
                             </form>
@@ -90,6 +102,7 @@
                     email: '',
                 },
                 users:[],
+                errors:{ },
                 async getData() {
                     try {
                        let response = await fetch('http://127.0.0.1:8000/api/users')
@@ -103,6 +116,8 @@
                     this.form.id = '';
                     this.form.name ='';
                     this.form.email ='';
+                    this.errors.email ='';
+                    this.errors.name = ''
                 },
                 async addUser(){
                     try{
@@ -114,10 +129,12 @@
                         },
                           body: JSON.stringify(this.form)                                                     
                         })
-                        let data =  await response.json();
-                        this.getData();    
-                    }catch(error){
-                        
+                        let res =  await response;
+                        if(res.status !== 200) throw res.json()   
+                        else this.getData();                            
+                    }catch(e){
+                     let res =  await e
+                     this.errors = res.errors
                     }
                 },
                 async editUser(user){
@@ -125,6 +142,8 @@
                     this.form.id = user.id;
                     this.form.name = user.name;
                     this.form.email = user.email;
+                    this.errors.email ='';
+                    this.errors.name = ''
                 },
                 async updateUser(){
                     try{
@@ -137,10 +156,12 @@
                              },
                           body: JSON.stringify(this.form)                                                     
                         })
-                        let data  =  await response.json();
-                        this.getData();
-                    }catch(error){
-                        
+                        let res  =  await response;
+                        if(res.status !== 200) throw res.json()   
+                        else this.getData();                            
+                    }catch(e){
+                     let res =  await e
+                     this.errors = res.errors
                     }
                 },
                 async deleteUser(id){
