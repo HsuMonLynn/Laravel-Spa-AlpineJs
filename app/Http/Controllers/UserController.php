@@ -53,7 +53,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'email' =>  ['required', 'max:191', 'email'],
+            'email' =>  'required|string|email|unique:users,email'.$this->id,
         ]);
         $user = User::find($id);
         $user->update($request->all());
